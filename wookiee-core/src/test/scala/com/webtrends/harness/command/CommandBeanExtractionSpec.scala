@@ -2,11 +2,11 @@ package com.webtrends.harness.command
 
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
-import org.specs2.mutable.Specification
+import org.specs2.mutable.{SpecificationWithJUnit}
 import java.lang.Double
 
 
-class CommandBeanExtractionSpec extends Specification
+class CommandBeanExtractionSpec extends SpecificationWithJUnit
 {
 
   def passThroughFac(v: Map[String, Any]): Map[String, Any] = v
@@ -65,6 +65,22 @@ class CommandBeanExtractionSpec extends Specification
         extractPromise must beSuccessfulTry
 
         extractPromise.get("optionalString") mustEqual "defaultValue"
+      }
+
+      "Support optional value without a default " in {
+
+        val testExtractor = new CommandBeanExtraction {
+          override val CommandBeanExtractParameters = List[CommandBeanExtractParameter[_]](
+            OptionalStringCommandBeanExtractParameter("optionalString")
+          )
+        }
+
+        val bean = CommandBean(Map())
+
+        val extractPromise = testExtractor.extractFromCommandBean[Map[String, Any]](bean, passThroughFac)
+        extractPromise must beSuccessfulTry
+
+        extractPromise.get.get("optionalString") mustEqual None
       }
 
       "Support optional parameters without a default " in {
